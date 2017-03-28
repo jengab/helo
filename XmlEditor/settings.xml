@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<settings>
+    <offline>
+        <GoodnessLimit value="0.4"/>
+        <MergeLimit value="0.7999999999999999"/>
+        <FillLimit value="0.5"/>
+        <HeaderLen value="4"/>
+        <UseDb value="0"/>
+        <UsedLocal value=""/>
+    </offline>
+</settings>
