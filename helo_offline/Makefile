@@ -24,10 +24,10 @@ endif
 
 .PHONY: clean
 helo_offline: obj/ $(OBJ_FILES)
-	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) -o $@ -std=c++11 $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
+	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) -o $@ -std=c++0x $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
 obj/%.o: src/source/%.cpp ../SQLiteCpp/sqlitecpp_build
-	$(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -std=c++11 -c $< -o $@
+	$(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -std=c++0x -c $< -o $@
 
 obj/:
 	mkdir -p obj
@@ -40,6 +40,3 @@ clean:
 	rm -rf obj
 	rm -rf ../SQLiteCpp/sqlitecpp_build
 	rm -f helo_offline
-
-print:
-	@echo $(OS)
