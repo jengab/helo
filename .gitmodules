@@ -1,3 +1,9 @@
 [submodule "SQLiteCpp"]
 	path = SQLiteCpp
 	url = https://github.com/SRombauts/SQLiteCpp
+[submodule "lest"]
+	path = lest
+	url = https://github.com/martinmoene/lest
+[submodule "FakeIt"]
+	path = FakeIt
+	url = https://github.com/eranpeer/FakeIt
