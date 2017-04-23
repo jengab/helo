@@ -1,8 +1,7 @@
 #include "LogParser.h"
 #include "lest/lest.hpp"
 
-const lest::test suite[] =
-{
+static const lest::test _logParserSuite[] {
     CASE("parse: Word determined correctly") {
         std::wstring str(L"WordTrial");
         wordtype ret = LogParser::parse(str);
@@ -70,6 +69,5 @@ const lest::test suite[] =
     }
 };
 
-int main(int argc, char* argv[]) {
-    return lest::run(suite, argc, argv);
-}
+extern const lest::tests logParserSuite(_logParserSuite,
+                                  _logParserSuite + sizeof(_logParserSuite) / sizeof(*_logParserSuite));
