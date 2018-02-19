@@ -1,2 +1,4 @@
-/Debug
-/Release
+obj
+helo_offline
+test_helo_offline
+coverage
