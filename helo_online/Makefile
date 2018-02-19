@@ -1,8 +1,8 @@
 CPP_FILES:=$(wildcard src/source/*.cpp)
 OBJ_FILES:=$(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))
 INCLUDE_DIRS:=-I ../SQLiteCpp/include -I ../SQLiteCpp/sqlite3 -I src/header
-LD_DIRS:=-L ../SQLiteCpp/sqlitecpp_build/sqlite3 -L ../SQLiteCpp/sqlitecpp_build 
-LD_FLAGS:=-lSQLiteCpp -lsqlite3 
+LD_DIRS:=-L ../sqlitecpp_build/sqlite3 -L ../sqlitecpp_build
+LD_FLAGS:=-lSQLiteCpp -lsqlite3
 
 ifeq (yes, $(DBG))
 	CXX_FLAGS:=-g -O0 -D DEBUG
@@ -25,17 +25,17 @@ endif
 helo_online: obj/ $(OBJ_FILES)
 	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) -o $@ -std=c++0x $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
-obj/%.o: src/source/%.cpp ../SQLiteCpp/sqlitecpp_build
+obj/%.o: src/source/%.cpp ../sqlitecpp_build
 	$(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -std=c++0x -c $< -o $@
 
 obj/:
 	mkdir -p obj
 
-../SQLiteCpp/sqlitecpp_build:
-	mkdir -p ../SQLiteCpp/sqlitecpp_build
-	cd ../SQLiteCpp/sqlitecpp_build; cmake $(CMAKE_ARGS) ..; cmake --build .
+../sqlitecpp_build:
+	mkdir -p ../sqlitecpp_build
+	cd ../sqlitecpp_build; cmake $(CMAKE_ARGS) ../SQLiteCpp; cmake --build .
 
 clean:
 	rm -rf obj
 	rm -f helo_online
-	rm -rf ../SQLiteCpp/sqlitecpp_build
+	rm -rf ../sqlitecpp_build

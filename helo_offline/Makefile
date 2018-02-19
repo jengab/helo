@@ -1,7 +1,7 @@
 CPP_FILES:=$(wildcard src/source/*.cpp)
 SRC_PATTERN:=src/source/%.cpp
 OBJ_FILES:=$(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))
-LD_DIRS:=-L ../SQLiteCpp/sqlitecpp_build/sqlite3 -L ../SQLiteCpp/sqlitecpp_build
+LD_DIRS:=-L ../sqlitecpp_build/sqlite3 -L ../sqlitecpp_build
 LD_FLAGS:=-lSQLiteCpp -lsqlite3
 INCLUDE_DIRS:=-I ../SQLiteCpp/include -I src/header
 
@@ -52,17 +52,18 @@ endif
 all: obj/ $(OBJ_FILES)
 	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) -o helo_offline $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
-obj/%.o: $(SRC_PATTERN) ../SQLiteCpp/sqlitecpp_build
+obj/%.o: $(SRC_PATTERN) ../sqlitecpp_build
 	$(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -c $< -o $@
 
 obj/:
 	mkdir -p obj
 
-../SQLiteCpp/sqlitecpp_build:
-	mkdir -p ../SQLiteCpp/sqlitecpp_build
-	cd ../SQLiteCpp/sqlitecpp_build; cmake $(CMAKE_ARGS) ..; cmake --build .
+../sqlitecpp_build:
+	mkdir -p ../sqlitecpp_build
+	cd ../sqlitecpp_build; cmake $(CMAKE_ARGS) ../SQLiteCpp; cmake --build .
 
 clean:
 	rm -rf obj
 	rm -f helo_offline
 	rm -f test_helo_offline
+	rm -rf ../sqlitecpp_build
