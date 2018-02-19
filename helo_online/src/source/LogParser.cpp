@@ -1,5 +1,5 @@
+#include <regex>
 #include "LogParser.h"
-#include <boost/range/iterator_range.hpp>
 
 const wchar_t* LogParser::TemplateNodeName(L"template");
 const wchar_t* LogParser::GoodnessAttributeName(L"goodness");
@@ -53,7 +53,7 @@ void LogParser::ProcessHybrid(std::wstring& str){
 /**
 * This method categorizes a token to one of the following categories:
 *  Word, Number, Hybrid. Hybrid tokens are those who are not word and nor
-* they are Numbers. If the token is Hybrid then it gets modified also by 
+* they are Numbers. If the token is Hybrid then it gets modified also by
 * ProcessHybrid method.
 *
 * @param[in,out] word The token to classify
@@ -191,9 +191,9 @@ std::wistream& operator>>(std::wistream& is,LogParser& parser){
 			}
 		}
 
-		boost::wregex expr(parser.regexp,boost::regex_constants::extended);
-		boost::wsregex_token_iterator WordIterator(msg.begin(),msg.end(),expr,-1);
-		boost::wsregex_token_iterator End;
+		std::wregex expr(parser.regexp);
+		std::wsregex_token_iterator WordIterator(msg.begin(),msg.end(),expr,-1);
+		std::wsregex_token_iterator End;
 
 		ArrayOfWords LineArray;
 		for(;WordIterator!=End;++WordIterator){

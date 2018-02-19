@@ -3,11 +3,11 @@
 #include "pugixml.hpp"
 #include "OutputHandler.h"
 #include <sstream>
+#include <regex>
 #include <string.h>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/spirit/home/support/utf8.hpp>
 #include <boost/locale.hpp>
-#include <boost/regex.hpp>
 
 using namespace boost::locale::conv;
 
@@ -22,7 +22,7 @@ ClusterParser::ClusterParser(const Settings& s):settings(s){
 
 	while(query.executeStep()){
 		sqlite3_int64 id=query.getColumn(0).getInt64();
-		
+
 		std::vector<TokenDescriptor> Template;
 		std::wistringstream TemplStr(utf_to_utf<wchar_t>(from_utf((const char*)query.getColumn(1),"UTF-8")));
 		while(!TemplStr.eof()){
@@ -44,7 +44,7 @@ ClusterParser::ClusterParser(const Settings& s):settings(s){
 /*std::wistream& operator>>(std::wistream& is,ClusterParser& parser){
 	pugi::xml_document doc;
 	doc.load(is);
-	
+
 	for(pugi::xml_node& ActClust:doc){ //iterate on cluster nodes
 		double goodness=ActClust.attribute(LogParser::GoodnessAttributeName).as_double();
 		double AvgLen=ActClust.attribute(LogParser::AvgLenAttributeName).as_double();
@@ -138,9 +138,9 @@ void ClusterParser::ProcessMessage(std::wstring& line){
 	}
 
 	std::vector<TokenDescriptor> LineVect;
-	boost::wregex expr(settings.regexp,boost::regex_constants::extended);
-	boost::wsregex_token_iterator TokenIterator(msg.begin(),msg.end(),expr,-1);
-	boost::wsregex_token_iterator End;
+	std::wregex expr(settings.regexp);
+	std::wsregex_token_iterator TokenIterator(msg.begin(),msg.end(),expr,-1);
+	std::wsregex_token_iterator End;
 	for(;TokenIterator!=End;++TokenIterator){
 		std::wstring ActToken=*TokenIterator;
 
