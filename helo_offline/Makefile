@@ -6,7 +6,7 @@ LD_FLAGS:=-lSQLiteCpp -lsqlite3
 INCLUDE_DIRS:=-I ../SQLiteCpp/include -I src/header
 
 ifeq (yes, $(DBG))
-	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++0x
+	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++0x -Wall
 else
 	CXX_FLAGS:=-O3 -std=c++0x
 endif
@@ -65,3 +65,4 @@ obj/:
 clean:
 	rm -rf obj
 	rm -f helo_offline
+	rm -f test_helo_offline
