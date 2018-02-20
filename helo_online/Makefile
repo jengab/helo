@@ -11,13 +11,13 @@ else
 endif
 
 ifneq (,$(findstring Windows, $(OS)))
-	LD_FLAGS+=-lssp -lws2_32 -lboost_regex-mgw63-mt-1_63 -lboost_thread-mgw63-mt-1_63 \
+	LD_FLAGS+=-lssp -lws2_32 -lboost_thread-mgw63-mt-1_63 \
 						-lboost_system-mgw63-mt-1_63 -lboost_locale-mgw63-mt-1_63 -liconv
 	INCLUDE_DIRS+=-I D:\boost
 	LD_DIRS+=-L D:/boost/stage/lib
 	CMAKE_ARGS:=-G "MSYS Makefiles"
 else
-	LD_FLAGS+=-lpthread -ldl -lboost_regex -lboost_thread -lboost_system -lboost_locale
+	LD_FLAGS+=-lpthread -ldl -lboost_thread -lboost_system -lboost_locale
 	CMAKE_ARGS:=-G "Unix Makefiles"
 endif
 
