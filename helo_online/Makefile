@@ -29,6 +29,7 @@ endif
 endif
 
 .PHONY: clean
+.PHONY: clean_3pp
 
 helo_online: obj/ $(PUGI_CPPS) $(OBJ_FILES)
 	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) -o $@ -std=c++0x $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
@@ -54,5 +55,7 @@ obj/:
 clean:
 	rm -rf obj
 	rm -f helo_online
-	rm -rf ../sqlitecpp_build
+
+clean_3pp:
 	rm -rf ../pugi_build
+	rm -rf ../sqlitecpp_build

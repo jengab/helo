@@ -39,6 +39,7 @@ endif
 endif
 
 .PHONY: clean
+.PHONY: clean_3pp
 .PHONY: test
 
 helo_offline: obj/ $(PUGI_CPPS) $(OBJ_FILES)
@@ -49,9 +50,9 @@ test: obj/ $(OBJ_FILES) $(TEST_OBJ_FILES)
 	$(CXX) $(OBJ_FILES) -o test_helo_offline $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 	./test_helo_offline
 ifeq ($(COVERAGE), yes)
-	mkdir -p ../coverage
-	lcov -q --base-directory src/source --directory ./obj --no-external -c --output-file ../coverage/app.info
-	genhtml -q --output-directory ../coverage ../coverage/app.info
+	mkdir -p coverage
+	lcov -q --base-directory src/source --directory ./obj --no-external -c --output-file coverage/app.info
+	genhtml -q --output-directory coverage coverage/app.info
 endif
 
 obj/%.o: $(SRC_PATTERN) $(PUGI_CPPS) ../sqlitecpp_build
@@ -76,5 +77,8 @@ clean:
 	rm -rf obj
 	rm -f helo_offline
 	rm -f test_helo_offline
+	rm -rf coverage
+
+clean_3pp:
 	rm -rf ../sqlitecpp_build
 	rm -rf ../pugi_build

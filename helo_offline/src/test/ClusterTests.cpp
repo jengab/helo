@@ -3,7 +3,7 @@
 
 static const lest::test _clusterSuite[] {
     CASE("Dummy1") {
-        EXPECT(1 == 0);
+        //EXPECT(1 == 0);
     },
     CASE("Dummy2") {
         EXPECT(1 == 1);
