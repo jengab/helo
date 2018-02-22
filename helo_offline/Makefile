@@ -1,9 +1,12 @@
 CPP_FILES:=$(wildcard src/source/*.cpp)
 SRC_PATTERN:=src/source/%.cpp
-OBJ_FILES:=$(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))
+PUGI_PATTERN:=../pugi_build/%.cpp
+PUGI_CPPS:=$(addprefix ../pugi_build/,$(notdir $(wildcard ../pugixml/src/*.cpp)))
+PUGI_OBJS:=$(addprefix ../pugi_build/,$(notdir $(PUGI_CPPS:.cpp=.o)))
+OBJ_FILES:=$(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o))) $(PUGI_OBJS)
 LD_DIRS:=-L ../sqlitecpp_build/sqlite3 -L ../sqlitecpp_build
 LD_FLAGS:=-lSQLiteCpp -lsqlite3
-INCLUDE_DIRS:=-I ../SQLiteCpp/include -I src/header
+INCLUDE_DIRS:=-I ../SQLiteCpp/include -I src/header -I ../pugi_build
 
 ifeq (yes, $(DBG))
 	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++0x -Wall
@@ -19,7 +22,7 @@ ifeq ($(MAKECMDGOALS), test)
 	INCLUDE_DIRS+=-I ../lest/include -I ../FakeIt/single_header/standalone
 	LD_FLAGS+=-lgcov
 	CPP_FILES:=$(wildcard src/*/*.cpp)
-	OBJ_FILES:=$(filter-out obj/main_offline.o, $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o))))
+	OBJ_FILES:=$(filter-out obj/main_offline.o, $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))) $(PUGI_OBJS)
 	SRC_PATTERN:=src/*/%.cpp
 endif
 
@@ -36,8 +39,10 @@ endif
 endif
 
 .PHONY: clean
-.PHONY: all
 .PHONY: test
+
+helo_offline: obj/ $(PUGI_CPPS) $(OBJ_FILES)
+	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) -o helo_offline $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
 test: obj/ $(OBJ_FILES) $(TEST_OBJ_FILES)
 	rm -f obj/*.gcda
@@ -49,14 +54,19 @@ ifeq ($(COVERAGE), yes)
 	genhtml -q --output-directory ../coverage ../coverage/app.info
 endif
 
-all: obj/ $(OBJ_FILES)
-	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) -o helo_offline $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
-
-obj/%.o: $(SRC_PATTERN) ../sqlitecpp_build
+obj/%.o: $(SRC_PATTERN) $(PUGI_CPPS) ../sqlitecpp_build
 	$(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -c $< -o $@
 
 obj/:
 	mkdir -p obj
+
+../pugi_build/%.o: $(PUGI_PATTERN)
+	$(CXX) $(CXX_FLAGS) -c $< -o $@
+
+../pugi_build/%.cpp:
+	mkdir -p ../pugi_build
+	find ../pugixml/src -regex ".*\.\(hpp\|cpp\)" -exec cp {} ../pugi_build \;
+	sed -i '/\/\/ #define PUGIXML_WCHAR_MODE/c\#define PUGIXML_WCHAR_MODE' ../pugi_build/pugiconfig.hpp
 
 ../sqlitecpp_build:
 	mkdir -p ../sqlitecpp_build
@@ -67,3 +77,4 @@ clean:
 	rm -f helo_offline
 	rm -f test_helo_offline
 	rm -rf ../sqlitecpp_build
+	rm -rf ../pugi_build
