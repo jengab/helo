@@ -1,15 +1,16 @@
 [submodule "SQLiteCpp"]
-	path = SQLiteCpp
+	path = 3pp/SQLiteCpp
 	url = https://github.com/SRombauts/SQLiteCpp
 	branch = master
 [submodule "lest"]
-	path = lest
+	path = 3pp/lest
 	url = https://github.com/martinmoene/lest
 	branch = master
 [submodule "FakeIt"]
-	path = FakeIt
+	path = 3pp/FakeIt
 	url = https://github.com/eranpeer/FakeIt
 	branch = master
 [submodule "pugixml"]
-	path = pugixml
-	url = https://github.com/zeux/pugixml
+	path = 3pp/pugixml
+    url = https://github.com/zeux/pugixml
+    branch = master
