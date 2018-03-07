@@ -1,8 +1,8 @@
 #include <iostream>
+#include <thread>
+#include <codecvt>
 #include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/asio.hpp>
-#include <boost/locale.hpp>
-#include <boost/thread/thread.hpp>
 #include <pugixml.hpp>
 #include "ConfigFile.h"
 #include "ClusterParser.h"
@@ -10,7 +10,7 @@
 
 /**
 * @file main_online.cpp
-* 
+*
 * This file contains the main() function of the online algorithm,
 * and all the thread functions used in the algorithm.
 * @author Jenei Gábor <jengab@elte.hu>
@@ -19,7 +19,6 @@
 using namespace boost::interprocess;
 using boost::asio::ip::tcp;
 using namespace std;
-using namespace boost::locale::conv;
 
 /// \c typedef for \c shared_ptr on boost TCP socket
 ///
@@ -71,11 +70,10 @@ void ServeRequest(socketPtr sock,std::shared_ptr<ClusterParser> parser,const Set
 			boost::system::error_code error;
 			sock->read_some(boost::asio::buffer(&byte,1),error);
 			msg+=byte;
-			
+
 			if(byte=='\n'){
-				std::string MsgStr=from_utf(msg,"UTF-8");
-				//OutputHandler::print(std::cout,MsgStr);
-				std::wstring NewMsg=utf_to_utf<wchar_t>(MsgStr);
+				std::wstring NewMsg=std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(msg);
+				//OutputHandler::print(std::cout,NewMsg);
 				parser->ProcessMessage(NewMsg);
 				msg="";
 			}
@@ -114,10 +112,10 @@ void ServeRequest(socketPtr sock,std::shared_ptr<ClusterParser> parser,const Set
  * <tr><td>DbFile</td>
  * <td>The path to the SQLite3 database file (used for input and output). This parameter is necessary,
  *  if it is not set then the program looks for a configuration file at "settings.xml"</td></tr>
- * <tr><td>LogPath</td><td>The path for the error log file. It can be set by -lf\<value\> command line parameter. 
+ * <tr><td>LogPath</td><td>The path for the error log file. It can be set by -lf\<value\> command line parameter.
  * If no parameter is set then the console will be used to show the error messages.</td></tr>
  * <tr><td>port</td>
- * <td>The TCP port to listen on, normally for syslog messages this is 514 
+ * <td>The TCP port to listen on, normally for syslog messages this is 514
  * (this is the default value) it can be set by -p\<value\></td></tr>
  * <tr><td>lim</td>
  * <td> The threshold value for joining (merging) clusters
@@ -244,12 +242,12 @@ int main(int argc,char** argv){
 		return -1;
 	}
 
-	boost::thread(StopHandler,acceptor).detach();
+	std::thread(StopHandler,acceptor).detach();
 	while(true){
 		try{
 			std::shared_ptr<tcp::socket> remote=std::make_shared<tcp::socket>(srv);
 			acceptor->accept(*remote);
-			boost::thread(ServeRequest,remote,proc,settings).detach();
+			std::thread(ServeRequest,remote,proc,settings).detach();
 		}
 		catch(boost::system::system_error& e){
 

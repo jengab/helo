@@ -1,6 +1,6 @@
 #include "ClusterTemplate.h"
 
-#include <boost/spirit/home/support/utf8.hpp>
+#include <codecvt>
 
 /**
 * This method tests if a log messages matches the represented cluster template
@@ -88,7 +88,7 @@ std::string ClusterTemplate::getValueStr() const{
   values << "INSERT INTO clusters VALUES(NULL,\"";
 
   for(const TokenDescriptor& ActToken:Template){
-    values << boost::spirit::to_utf8<wchar_t>(ActToken.TokenString) << " ";
+    values << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(ActToken.TokenString) << " ";
   }
 
   values << "\"," << goodness << "," << AvgLen << ")";
@@ -106,7 +106,7 @@ std::string ClusterTemplate::getUpdateStr() const{
   update << "UPDATE clusters SET goodness=" << goodness << ",AvgLen=" << AvgLen << ",template=\"";
 
   for(const TokenDescriptor& ActToken:Template){
-    update << boost::spirit::to_utf8<wchar_t>(ActToken.TokenString) << " ";
+    update << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(ActToken.TokenString) << " ";
   }
 
   update << "\"" << "WHERE clustid=" << id;

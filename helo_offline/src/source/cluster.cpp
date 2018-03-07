@@ -1,6 +1,6 @@
 #include <stdexcept>
 #include <map>
-#include <boost/spirit/home/support/utf8.hpp>
+#include <codecvt>
 #include "cluster.h"
 #include "pugixml.hpp"
 
@@ -280,7 +280,7 @@ SQLite::Database& operator<<(SQLite::Database& db,const Cluster& c){
     try{
         query << "INSERT INTO clusters VALUES (NULL,\"";
         for(const std::shared_ptr<TokenDescriptor> ActWord:(*c.Content->begin())){
-            query << boost::spirit::to_utf8<wchar_t>(ActWord->TokenString) << " ";
+            query << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(ActWord->TokenString) << " ";
         }
 
         query << "\"," << c.goodness << "," << c.getAvgLen() << ")";

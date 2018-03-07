@@ -8,7 +8,6 @@
 #include <sstream>
 #include <memory>
 #include <locale>
-#include <boost/regex.hpp>
 
 /**
  * @file LogParser.h
@@ -139,7 +138,7 @@ public:
 	const DictionaryPtr getDictionary() const;
 	const std::shared_ptr<ListOfLines> getContent() const;
 
-	
+
 	static wordtype parse(std::wstring&);
 
 	/// The XML tag used in the cluster output
@@ -152,7 +151,7 @@ public:
 	/// This is the attribute of the Cluster node
 	///
 	static const wchar_t* GoodnessAttributeName;
-	
+
 	/// The XML attribute used in the cluster output
 	/// for average length.
 	/// This is the attribute of the Cluster node
@@ -164,7 +163,7 @@ public:
 	/// This is the attribute of the Cluster node
 	///
 	static const wchar_t* IdAttributeName;
-	
+
 	/// The XML tag used in the cluster output
 	/// to represent the beginning/end of a cluster.
 	///

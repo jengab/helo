@@ -14,13 +14,12 @@ else
 endif
 
 ifneq (,$(findstring Windows, $(OS)))
-	LD_FLAGS+=-lssp -lws2_32 -lboost_thread-mgw63-mt-1_63 \
-						-lboost_system-mgw63-mt-1_63 -lboost_locale-mgw63-mt-1_63 -liconv
+	LD_FLAGS+=-lssp -lws2_32 -lboost_system-mgw63-mt-1_63 -liconv
 	INCLUDE_DIRS+=-I D:\boost
 	LD_DIRS+=-L D:/boost/stage/lib
 	CMAKE_ARGS:=-G "MSYS Makefiles"
 else
-	LD_FLAGS+=-lpthread -ldl -lboost_thread -lboost_system -lboost_locale
+	LD_FLAGS+=-lpthread -ldl -lboost_system
 	CMAKE_ARGS:=-G "Unix Makefiles"
 ifeq ($(shell uname -s), Darwin)
 	INCLUDE_DIRS+=-I /opt/local/include
@@ -29,6 +28,7 @@ endif
 
 .PHONY: clean
 .PHONY: clean_3pp
+.PHONY: clean_all
 
 helo_online: $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES)
 	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))

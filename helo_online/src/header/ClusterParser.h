@@ -2,7 +2,7 @@
 #define CLUSTER_PARSER_H
 
 #include <list>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <SQLiteCpp/SQLiteCpp.h>
 
 #include "ClusterTemplate.h"
@@ -22,8 +22,8 @@
 class ClusterParser{
 private:
 	const Settings settings;
-	boost::mutex WriteMutex;
-	std::list<ClusterTemplate> Clusters;
+	std::mutex WriteMutex;
+    std::list<ClusterTemplate> Clusters;
 	ClusterParser(const ClusterParser&):settings(){}
 
 public:

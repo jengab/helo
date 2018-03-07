@@ -4,12 +4,18 @@
 #include "OutputHandler.h"
 #include <sstream>
 #include <regex>
+#include <codecvt>
 #include <string.h>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/spirit/home/support/utf8.hpp>
-#include <boost/locale.hpp>
 
-using namespace boost::locale::conv;
+inline std::wstring from_utf(const char* bytes) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.from_bytes(bytes);
+}
+
+inline std::string to_utf(const std::wstring& str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.to_bytes(str);
+}
 
 /**
 * Constructor
@@ -24,7 +30,7 @@ ClusterParser::ClusterParser(const Settings& s):settings(s){
 		sqlite3_int64 id=query.getColumn(0).getInt64();
 
 		std::vector<TokenDescriptor> Template;
-		std::wistringstream TemplStr(utf_to_utf<wchar_t>(from_utf((const char*)query.getColumn(1),"UTF-8")));
+		std::wistringstream TemplStr(from_utf((const char*)query.getColumn(1)));
 		while(!TemplStr.eof()){
 			std::wstring ActToken;
 			TemplStr >> ActToken;
@@ -149,15 +155,15 @@ void ClusterParser::ProcessMessage(std::wstring& line){
 	}
 	if(LineVect.empty()) return;
 
-	boost::interprocess::scoped_lock<boost::mutex>(WriteMutex);
-	ClusterTemplate* ClusterAssigned=NULL;
+    std::lock_guard<std::mutex> writerGuard(WriteMutex);
+    ClusterTemplate* ClusterAssigned=NULL;
 	double MaxGoodness=0;
 	for(ClusterTemplate& ActTempl:Clusters){
 		if(ActTempl.match(LineVect)){ //exact match, we can assign the id only
 			std::ostringstream query;
 			try{
 				SQLite::Database db(settings.DbFile.c_str(),SQLITE_OPEN_READWRITE);
-				query << "INSERT INTO syslog VALUES(" << ActTempl.getId() << ",\"" << boost::spirit::to_utf8<wchar_t>(msg) << "\")";
+				query << "INSERT INTO syslog VALUES(" << ActTempl.getId() << ",\"" << to_utf(msg) << "\")";
 				db.exec(query.str().c_str());
 			}
 			catch(const SQLite::Exception& e){
@@ -180,7 +186,7 @@ void ClusterParser::ProcessMessage(std::wstring& line){
 			SQLite::Transaction tr(db);
 			db.exec(ClusterAssigned->getUpdateStr().c_str()); //update clusters
 			std::ostringstream query;
-			query << "INSERT INTO syslog VALUES(" << ClusterAssigned->getId() << ",\"" << boost::spirit::to_utf8<wchar_t>(msg) << "\")";
+			query << "INSERT INTO syslog VALUES(" << ClusterAssigned->getId() << ",\"" << to_utf(msg) << "\")";
 			db.exec(query.str().c_str());
 			tr.commit();
 		}
@@ -195,7 +201,7 @@ void ClusterParser::ProcessMessage(std::wstring& line){
 			db.exec(ActTempl.getValueStr().c_str()); //insert to clusters
 			sqlite3_int64 Id=db.getLastInsertRowid();
 			std::ostringstream query;
-			query << "INSERT INTO syslog VALUES(" << Id << ",\"" << boost::spirit::to_utf8<wchar_t>(msg) << "\")";
+			query << "INSERT INTO syslog VALUES(" << Id << ",\"" << to_utf(msg) << "\")";
 			db.exec(query.str().c_str());
 			ActTempl.setId(Id);
 			tr.commit();
