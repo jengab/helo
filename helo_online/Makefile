@@ -18,9 +18,11 @@ ifneq (,$(findstring Windows, $(OS)))
 	INCLUDE_DIRS+=-I D:\boost
 	LD_DIRS+=-L D:/boost/stage/lib
 	CMAKE_ARGS:=-G "MSYS Makefiles"
+	EXEC_NAME:=helo_online.exe
 else
 	LD_FLAGS+=-lpthread -ldl -lboost_system
 	CMAKE_ARGS:=-G "Unix Makefiles"
+	EXEC_NAME:=helo_online
 ifeq ($(shell uname -s), Darwin)
 	INCLUDE_DIRS+=-I /opt/local/include
 endif
@@ -30,7 +32,7 @@ endif
 .PHONY: clean_3pp
 .PHONY: clean_all
 
-helo_online: $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES)
+$(EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES)
 	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))
 	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) $(PUGI_OBJS) -o $@ $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
@@ -58,7 +60,7 @@ $(3PP_SRC):
 
 clean:
 	rm -rf obj
-	rm -f helo_online
+	rm -f $(EXEC_NAME)
 
 clean_3pp:
 	rm -rf $(3PP_BUILD)

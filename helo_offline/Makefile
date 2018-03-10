@@ -18,7 +18,7 @@ ifeq (yes, $(COVERAGE))
 endif
 
 ifeq ($(MAKECMDGOALS), test)
-	INCLUDE_DIRS+=-I ../lest/include -I ../FakeIt/single_header/standalone
+	INCLUDE_DIRS+=-I $(3PP_SRC)/lest/include -I $(3PP_SRC)/FakeIt/single_header/standalone
 	LD_FLAGS+=-lgcov
 	CPP_FILES:=$(wildcard src/*/*.cpp)
 	OBJ_FILES:=$(filter-out obj/main_offline.o, $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))) $(PUGI_OBJS)
@@ -29,9 +29,13 @@ ifneq (,$(findstring Windows, $(OS)))
 	LD_FLAGS+=-lssp
 	INCLUDE_DIRS+=-I D:\boost
 	CMAKE_ARGS:=-G "MSYS Makefiles"
+	EXEC_NAME:=helo_offline.exe
+	TEST_EXEC_NAME:=test_helo_offline.exe
 else
 	LD_FLAGS+=-lpthread -ldl
 	CMAKE_ARGS:=-G "Unix Makefiles"
+	EXEC_NAME:=helo_offline
+	TEST_EXEC_NAME:=test_helo_offline
 ifeq ($(shell uname -s), Darwin)
 	INCLUDE_DIRS+=-I /opt/local/include
 endif
@@ -42,14 +46,17 @@ endif
 .PHONY: clean_all
 .PHONY: test
 
-helo_offline: $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES)
+test: $(TEST_EXEC_NAME)
+
+$(EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES)
 	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))
 	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) $(PUGI_OBJS) -o $@ $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
-test: obj/ $(OBJ_FILES) $(TEST_OBJ_FILES)
+$(TEST_EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES) $(TEST_OBJ_FILES)
 	rm -f obj/*.gcda
-	$(CXX) $(OBJ_FILES) -o test_helo_offline $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
-	./test_helo_offline
+	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))
+	$(CXX) $(OBJ_FILES) $(PUGI_OBJS) -o $(TEST_EXEC_NAME) $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
+	./$(TEST_EXEC_NAME)
 ifeq ($(COVERAGE), yes)
 	mkdir -p coverage
 	lcov -q --base-directory src/source --directory ./obj --no-external -c --output-file coverage/app.info
@@ -80,8 +87,8 @@ $(3PP_SRC):
 
 clean:
 	rm -rf obj
-	rm -f helo_offline
-	rm -f test_helo_offline
+	rm -f $(EXEC_NAME)
+	rm -f $(TEST_EXEC_NAME)
 	rm -rf coverage
 
 clean_3pp:
