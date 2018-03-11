@@ -14,13 +14,13 @@ file_contents = "<file>\n"
 with open(sys.argv[1], 'r') as file_obj:
     file_contents += file_obj.read()
 file_contents += "</file>"
-root = ET.fromstring(file)
+root = ET.fromstring(file_contents)
 for ActClust in root:
     ActTemplate = ""
     for ActToken in ActClust:
         ActTemplate = ActTemplate + ActToken.get('value')+" "
 
-    values = "(%s, %s, %s, %s)" % (ActClust.get('id'), ActTemplate, ActClust.get('goodness').replace(",", "."),
+    values = "(%s, \"%s\", %s, %s)" % (ActClust.get('id'), ActTemplate, ActClust.get('goodness').replace(",", "."),
             ActClust.get('AvgLen'))
     c.execute("INSERT INTO clusters VALUES " + values)
 
