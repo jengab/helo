@@ -46,11 +46,11 @@ endif
 .PHONY: clean_all
 .PHONY: test
 
-test: $(TEST_EXEC_NAME)
-
 $(EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES)
 	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))
 	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) $(PUGI_OBJS) -o $@ $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
+
+test: $(TEST_EXEC_NAME)
 
 $(TEST_EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES) $(TEST_OBJ_FILES)
 	rm -f obj/*.gcda
