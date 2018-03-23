@@ -1,1 +1,0 @@
-helo_offline/src/header/LogParser.h

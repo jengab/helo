@@ -1,11 +1,15 @@
+HELO_COMMON:=../helo_common
 CPP_FILES:=$(wildcard src/source/*.cpp)
+COMMON_CPP_FILES:=$(wildcard $(HELO_COMMON)/src/source/*.cpp)
 SRC_PATTERN:=src/source/%.cpp
+COMMON_SRC_PATTERN:=$(HELO_COMMON)/src/source/%.cpp
 3PP_SRC:=../3pp
 3PP_BUILD:=$(3PP_SRC)/build
 OBJ_FILES:=$(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))
+COMMON_OBJ_FILES:=$(addprefix $(HELO_COMMON)/obj/,$(notdir $(COMMON_CPP_FILES:.cpp=.o)))
 LD_DIRS:=-L $(3PP_BUILD)/sqlitecpp_build/sqlite3 -L $(3PP_BUILD)/sqlitecpp_build
 LD_FLAGS:=-lSQLiteCpp -lsqlite3
-INCLUDE_DIRS:=-I $(3PP_SRC)/SQLiteCpp/include -I $(3PP_SRC)/SQLiteCpp/sqlite3 -I $(3PP_BUILD)/pugi_build -I src/header
+INCLUDE_DIRS:=-I $(3PP_SRC)/SQLiteCpp/include -I $(3PP_SRC)/SQLiteCpp/sqlite3 -I $(3PP_BUILD)/pugi_build -I src/header -I $(HELO_COMMON)/src/header
 
 ifeq (yes, $(DBG))
 	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++0x -Wall
@@ -31,10 +35,14 @@ endif
 .PHONY: clean
 .PHONY: clean_3pp
 .PHONY: clean_all
+.PHONY: test
 
-$(EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES)
+$(EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES) $(COMMON_OBJ_FILES)
 	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))
-	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) $(PUGI_OBJS) -o $@ $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
+	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) $(COMMON_OBJ_FILES) $(PUGI_OBJS) -o $@ $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
+
+$(HELO_COMMON)/obj/%.o:
+	cd $(HELO_COMMON); make DBG=$(DBG) COVERAGE=$(COVERAGE) $(MAKECMDGOALS)
 
 obj/%.o: $(SRC_PATTERN) $(3PP_BUILD)/pugi_build/pugixml.cpp $(3PP_BUILD)/sqlitecpp_build
 	$(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -c $< -o $@
@@ -60,6 +68,7 @@ $(3PP_SRC):
 
 clean:
 	rm -rf obj
+	rm -rf $(HELO_COMMON)/obj
 	rm -f $(EXEC_NAME)
 
 clean_3pp:
