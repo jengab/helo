@@ -1,3 +1,2 @@
-sqlitecpp_build
-pugi_build
-coverage
+3pp
+**/*.swp
