@@ -12,17 +12,17 @@ LD_FLAGS:=-lSQLiteCpp -lsqlite3
 INCLUDE_DIRS:=-I $(3PP_SRC)/SQLiteCpp/include -I $(3PP_BUILD)/pugi_build -I src/header -I $(HELO_COMMON)/src/header
 
 ifeq (yes, $(DBG))
-	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++0x -Wall
+	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++14 -Wall
 else
-	CXX_FLAGS:=-O3 -std=c++0x
+	CXX_FLAGS:=-O3 -std=c++14
 endif
 
 ifeq (yes, $(COVERAGE))
-	CXX_FLAGS:=-g -O0 --coverage -std=c++0x
+	CXX_FLAGS:=-g -O0 --coverage -std=c++14
 endif
 
 ifeq ($(MAKECMDGOALS), test)
-	INCLUDE_DIRS+=-I $(3PP_SRC)/lest/include
+	INCLUDE_DIRS+=-I $(3PP_SRC)/lest/include -I $(3PP_SRC)/trompeloeil/include
 	LD_FLAGS+=-lgcov
 	CPP_FILES:=$(wildcard src/*/*.cpp)
 	OBJ_FILES:=$(filter-out obj/main_offline.o, $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))) $(PUGI_OBJS)

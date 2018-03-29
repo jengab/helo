@@ -136,7 +136,11 @@ double Cluster::getGoodness(Cluster& other){
     double AvgLineLen=(double)(this_length+other_length)/2;
 
     for(size_t ActPos=0;ActPos<this_length && ActPos<other_length;++ActPos){
-        if(this_template[ActPos]->TokenString==other_template[ActPos]->TokenString) CommonWordCounter++;
+        if(this_template[ActPos]->TokenString==other_template[ActPos]->TokenString) ++CommonWordCounter;
+        if(this_template[ActPos]->TokenString==L"+n" || other_template[ActPos]->TokenString==L"+n") {
+            ++CommonWordCounter;
+            break;
+        }
     }
 
     return (double)CommonWordCounter/AvgLineLen;
@@ -145,7 +149,7 @@ double Cluster::getGoodness(Cluster& other){
 /**
  * @return A template that describes the cluster
  */
-ArrayOfWords Cluster::getTemplate(){
+ArrayOfWords Cluster::getTemplate() const {
     ArrayOfWords Template;
 
     std::vector<wordtype> AggregatedType(MaxLineLen,Number);

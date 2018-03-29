@@ -42,7 +42,7 @@ class Cluster{
     public:
 
         void Split(SafeList<Cluster>&);
-        ArrayOfWords getTemplate();
+        ArrayOfWords getTemplate() const;
         void compressToTemplate();
         Cluster(const std::shared_ptr<ListOfLines>,const DictionaryPtr);
         double getGoodness();
@@ -56,6 +56,13 @@ class Cluster{
          */
         double getAvgLen() const{
             return ((double)TotalLineLen/TotalLineCount);
+        }
+
+        /**
+         * @return The list of lines that currently belong to the cluster (by address)
+         */
+        const std::shared_ptr<const ListOfLines> getContent() const {
+            return Content;
         }
 
         /**

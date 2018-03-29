@@ -44,7 +44,7 @@ private:
 	std::mutex mutex;
 public:
 	SafeList(){}
-	
+
 	/**
 	 * Copy Constructor is never used in this project, but it maybe useful.
 	 * This method locks and copies the represented list. Finally it deletes
@@ -80,7 +80,7 @@ public:
 	 *
 	 * @return Returns a constant iterator that points to the first list element
 	 */
-	const_iterator begin()const{return list.cbegin();}
+	const_iterator begin() const {return list.cbegin();}
 
 	/**
 	 * This method is <b>NOT thread-safe</b>.
@@ -94,7 +94,14 @@ public:
 	 *
 	 * @return Returns a constant iterator that points to the last list element
 	 */
-	const_iterator end()const{return list.cend();}
+	const_iterator end() const {return list.cend();}
+
+    /**
+	 * This method is <b>NOT thread-safe</b>.
+	 *
+	 * @return Returns the number of stored elements
+	 */
+	size_t size() const {return list.size();}
 
 	/**
 	 * This method adds an element to the end of the list.

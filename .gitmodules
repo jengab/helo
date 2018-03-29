@@ -10,3 +10,7 @@
 	path = 3pp/pugixml
     url = https://github.com/zeux/pugixml
     branch = master
+[submodule "3pp/trompeloeil"]
+	path = 3pp/trompeloeil
+	url = https://github.com/rollbear/trompeloeil
+	branch = master
