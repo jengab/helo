@@ -22,7 +22,7 @@ ifeq (yes, $(COVERAGE))
 endif
 
 ifeq ($(MAKECMDGOALS), test)
-	INCLUDE_DIRS+=-I $(3PP_SRC)/lest/include -I $(3PP_SRC)/FakeIt/single_header/standalone
+	INCLUDE_DIRS+=-I $(3PP_SRC)/lest/include
 	LD_FLAGS+=-lgcov
 	CPP_FILES:=$(wildcard src/*/*.cpp)
 	OBJ_FILES:=$(filter-out obj/main_offline.o, $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))) $(PUGI_OBJS)
