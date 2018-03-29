@@ -67,7 +67,7 @@ ifeq ($(COVERAGE), yes)
 	genhtml -q --output-directory coverage coverage/app.info
 endif
 
-$(HELO_COMMON)/obj/%.o:
+$(HELO_COMMON)/obj/%.o: $(3PP_SRC)
 	cd $(HELO_COMMON); make DBG=$(DBG) COVERAGE=$(COVERAGE) $(MAKECMDGOALS)
 
 obj/%.o: $(SRC_PATTERN) $(3PP_BUILD)/pugi_build/pugixml.cpp $(3PP_BUILD)/sqlitecpp_build
