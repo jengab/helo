@@ -2,9 +2,10 @@
 #include <lest/lest.hpp>
 #include <trompeloeil.hpp>
 #include "cluster.h"
+#include "LogParserMock.h"
 
 static inline Cluster genCluster(const std::wstring& fileContent, const std::wstring& regexp) {
-    LogParser parser(0, regexp);
+    LogParserMock parser(0, regexp);
 
     std::wstringstream fileObj(fileContent);
     fileObj >> parser;
@@ -114,7 +115,7 @@ static const lest::test _clusterSuite[] {
                 A B E\n", L"[\\s]+");
         ListOfClusters workList;
         clust.Split(workList);
-        EXPECT(workList.size() == 3);
+        EXPECT(workList.size() == 3u);
     },
     CASE("getTemplate: Variable letters are compressed to asterix") {
         Cluster clust = genCluster(L"A B C\n\
@@ -150,7 +151,7 @@ static const lest::test _clusterSuite[] {
                 A B C\n\
                 A C C",L"[\\s]+");
         clust.compressToTemplate();
-        EXPECT(clust.getContent()->size() == 1);
+        EXPECT(clust.getContent()->size() == 1u);
     },
     CASE("compressToTemplate: Cluster contains the template") {
         Cluster clust = genCluster(L"A B C\n\
@@ -210,7 +211,7 @@ static const lest::test _clusterSuite[] {
     CASE("getGoodness: '+n' matches exactly once with longer lines") {
         Cluster clust1 = genCluster(L"A B C +n", L"[\\s]+");
         Cluster clust2 = genCluster(L"A X C Y E Z", L"[\\s]+");
-        //EXPECT(clust1.getGoodness(clust2) == 3.0/5.0);
+        EXPECT(clust1.getGoodness(clust2) == 3.0/5.0);
     },
     CASE("getGoodness: Goodness for same cluster is 1") {
         Cluster clust = genCluster(L"A B C", L"[\\s]+");

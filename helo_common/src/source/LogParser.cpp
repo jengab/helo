@@ -27,7 +27,7 @@ LogParser::LogParser(size_t HeaderLen,const std::wstring& regexp):HeaderLen(Head
  *
  * @param[in,out] str The token to process
  */
-void LogParser::ProcessHybrid(std::wstring& str){
+void LogParser::ProcessHybrid(std::wstring& str) const {
   size_t len=str.length();
   size_t j=0;
   bool firstAlphaFound=false;
@@ -53,13 +53,13 @@ void LogParser::ProcessHybrid(std::wstring& str){
 /**
  * This method categorizes a token to one of the following categories:
  *  Word, Number, Hybrid. Hybrid tokens are those who are not word and nor
- * they are Numbers. If the token is Hybrid then it gets modified also by 
+ * they are Numbers. If the token is Hybrid then it gets modified also by
  * ProcessHybrid method.
  *
  * @param[in,out] word The token to classify
  * @return The determined category, and the processed token
  */
-wordtype LogParser::parse(std::wstring& word){
+wordtype LogParser::parse(std::wstring& word) const {
   wordtype ret=Word;
   unsigned int Index=0;
   unsigned int WordLen=word.length();

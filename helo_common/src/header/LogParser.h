@@ -131,7 +131,7 @@ protected:
 	size_t HeaderLen;
 	DictionaryPtr dict;
 	std::wstring regexp;
-	static void ProcessHybrid(std::wstring&);
+	virtual void ProcessHybrid(std::wstring&) const;
 
 public:
 	LogParser(size_t,const std::wstring&);
@@ -139,7 +139,7 @@ public:
 	const std::shared_ptr<ListOfLines> getContent() const;
 
 
-	static wordtype parse(std::wstring&);
+	wordtype parse(std::wstring&) const;
 
 	/// The XML tag used in the cluster output
 	/// to denote the end/beginning of a template description
