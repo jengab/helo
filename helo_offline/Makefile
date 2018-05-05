@@ -55,17 +55,17 @@ $(EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES) $(COMMON_OBJ_F
 	$(CXX) $(CXX_FLAGS) $(OBJ_FILES) $(COMMON_OBJ_FILES) $(PUGI_OBJS) -o $@ $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
 test: $(TEST_EXEC_NAME)
-
-$(TEST_EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES) $(COMMON_OBJ_FILES) $(TEST_OBJ_FILES)
 	rm -f obj/*.gcda
-	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))
-	$(CXX) $(OBJ_FILES) $(COMMON_OBJ_FILES) $(PUGI_OBJS) -o $(TEST_EXEC_NAME) $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
-	./$(TEST_EXEC_NAME)
+	./$(TEST_EXEC_NAME) -p
 ifeq ($(COVERAGE), yes)
 	mkdir -p coverage
 	lcov -q --base-directory src/source -o $(HELO_COMMON)/src/source --directory ./obj -o $(HELO_COMMON)/obj --no-external -c --output-file coverage/app.info
 	genhtml -q --output-directory coverage coverage/app.info
 endif
+
+$(TEST_EXEC_NAME): $(3PP_BUILD)/pugi_build/pugixml.o obj/ $(OBJ_FILES) $(COMMON_OBJ_FILES) $(TEST_OBJ_FILES)
+	$(eval PUGI_OBJS=$(shell ls $(3PP_BUILD)/pugi_build/*.o))
+	$(CXX) $(OBJ_FILES) $(COMMON_OBJ_FILES) $(PUGI_OBJS) -o $(TEST_EXEC_NAME) $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
 $(HELO_COMMON)/obj/%.o: $(3PP_SRC)
 	cd $(HELO_COMMON); make DBG=$(DBG) COVERAGE=$(COVERAGE) $(MAKECMDGOALS)

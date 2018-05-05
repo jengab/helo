@@ -5,13 +5,13 @@ INCLUDE_DIRS:=-I src/header
 3PP_SRC:=../3pp/
 
 ifeq (yes, $(DBG))
-	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++0x -Wall
+	CXX_FLAGS:=-g -O0 -D DEBUG -std=c++14 -Wall
 else
-	CXX_FLAGS:=-O3 -std=c++0x
+	CXX_FLAGS:=-O3 -std=c++14
 endif
 
 ifeq (yes, $(COVERAGE))
-	CXX_FLAGS:=-g -O0 --coverage -std=c++0x
+	CXX_FLAGS:=-g -O0 --coverage -std=c++14
 endif
 
 ifeq ($(MAKECMDGOALS), test)
@@ -46,16 +46,16 @@ obj/:
 	mkdir -p obj
 
 test: $(TEST_EXEC_NAME)
-
-$(TEST_EXEC_NAME): obj/ $(OBJ_FILES) $(TEST_OBJ_FILES)
 	rm -f obj/*.gcda
-	$(CXX) $(OBJ_FILES) -o $(TEST_EXEC_NAME) $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
-	./$(TEST_EXEC_NAME)
+	./$(TEST_EXEC_NAME) -p
 ifeq ($(COVERAGE), yes)
 	mkdir -p coverage
 	lcov -q --base-directory src/source --directory ./obj --no-external -c --output-file coverage/app.info
 	genhtml -q --output-directory coverage coverage/app.info
 endif
+
+$(TEST_EXEC_NAME): obj/ $(OBJ_FILES) $(TEST_OBJ_FILES)
+	$(CXX) $(OBJ_FILES) -o $(TEST_EXEC_NAME) $(INCLUDE_DIRS) $(LD_DIRS) $(LD_FLAGS)
 
 clean:
 	rm -rf obj

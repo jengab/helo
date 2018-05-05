@@ -40,7 +40,6 @@ class Cluster{
         void CalcStatistics();
 
     public:
-
         void Split(SafeList<Cluster>&);
         ArrayOfWords getTemplate() const;
         void compressToTemplate();

@@ -221,6 +221,57 @@ static const lest::test _clusterSuite[] {
         Cluster clust1 = genCluster(L"A B C D\n", L"[\\s]+");
         Cluster clust2 = genCluster(L"X B C E\n", L"[\\s]+");
         EXPECT(clust1.getGoodness(clust2) == clust2.getGoodness(clust1));
+    },
+    CASE("join: The parameter cluster is empty after join") {
+        Cluster clust1 = genCluster(L"A B C", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A B C", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(clust2.getContent()->size() == 0u);
+    },
+    CASE("join: Same templates are joined into same") {
+        Cluster clust1 = genCluster(L"A B C", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A B C", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A B C");
+    },
+    CASE("join: Different line endings are joined into '+n'") {
+        Cluster clust1 = genCluster(L"A B C", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A B C D E", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A B C +n");
+    },
+    CASE("join: Different numbers are joined into '+d'") {
+        Cluster clust1 = genCluster(L"A 1 C", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A 0xa C", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A +d C");
+    },
+    CASE("join: Different word tokens are joined into '*'") {
+        Cluster clust1 = genCluster(L"A X C D", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A B C", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A * C +n");
+    },
+    CASE("join: After '+n' in second cluster processing stops") {
+        Cluster clust1 = genCluster(L"A 1 C D E F", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A 2 C X +n", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A +d C * +n");
+    },
+    CASE("join: After '+n' in first cluster processing stops") {
+        Cluster clust1 = genCluster(L"A 2 C X +n", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A 1 C D E F", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A +d C * +n");
+    },
+    CASE("join: Join gives same result right to left as reverse") {
+        Cluster clust1 = genCluster(L"A 1 C", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A 2 C D E", L"[\\s]+");
+        Cluster tmpClust1 = genCluster(L"A 1 C", L"[\\s]+");
+        Cluster tmpClust2 = genCluster(L"A 2 C D E", L"[\\s]+");
+        clust1.join(clust2);
+        tmpClust2.join(tmpClust1);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == getTemplateMsg(tmpClust2.getContent()->front()));
     }
 };
 
