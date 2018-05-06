@@ -103,7 +103,7 @@ void Cluster::CalcStatistics(){
     }
 
     if(TotalLineLen==0) TotalLineLen=AvgLen;
-    AvgLen/=Content->size();
+    AvgLen/=TotalLineCount;
 
     if(Content->size()==0 || MaxLineLen==0){
         goodness=1;
@@ -202,48 +202,38 @@ void Cluster::compressToTemplate(){
  * totally deleted
  */
 void Cluster::join(Cluster& other){
-    size_t SumLen=0;
-    for(const ArrayOfWords& ActLine:*other.Content){
-        SumLen+=ActLine.size();
-        Content->push_back(ActLine);
-    }
-
-    TotalLineLen+=SumLen;
-    TotalLineCount+=other.TotalLineCount;
-    other.Content->clear();
-
-    ListOfLines::iterator it=Content->begin();
-    ArrayOfWords& FirstLine=(*it++);
-    ArrayOfWords& SecondLine=(*it);
-    ArrayOfWords Template;
-    for(size_t i=0;i<FirstLine.size() && i<SecondLine.size();++i){
-        if(FirstLine[i]->TokenString==L"+n" || SecondLine[i]->TokenString==L"+n"){
-            Template.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"+n")));
-            Content->clear();
-            Content->push_back(Template);
-            return;
+    const ArrayOfWords& thisLine=Content->front();
+    const ArrayOfWords& otherLine=other.Content->front();
+    ArrayOfWords mergedTemplate;
+    for(size_t i=0;i<thisLine.size() && i<otherLine.size();++i){
+        if(thisLine[i]->TokenString==L"+n" || otherLine[i]->TokenString==L"+n"){
+            mergedTemplate.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"+n")));
+            break;
         }
 
         wordtype AggregateType=Number;
-        if(FirstLine[i]->TypeOfToken!=Number || SecondLine[i]->TypeOfToken!=Number) AggregateType=Word;
-        if(FirstLine[i]->TokenString==SecondLine[i]->TokenString){ //insert the string
-            Template.push_back(FirstLine[i]);
+        if(thisLine[i]->TypeOfToken!=Number || otherLine[i]->TypeOfToken!=Number) AggregateType=Word;
+        if(thisLine[i]->TokenString==otherLine[i]->TokenString){ //insert the string
+            mergedTemplate.push_back(thisLine[i]);
         }
         else{
             if(AggregateType==Number){ //insert +d
-                Template.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"+d")));
+                mergedTemplate.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"+d")));
             }
             else{ //insert *
-                Template.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"*")));
+                mergedTemplate.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"*")));
             }
         }
     }
 
-    if(FirstLine.size()!=SecondLine.size()){ //push_back +n
-        Template.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"+n")));
+    if(mergedTemplate.back()->TokenString!=L"+n" && thisLine.size()!=otherLine.size()){ //push_back +n
+        mergedTemplate.push_back(*dict->find(std::make_shared<TokenDescriptor>(L"+n")));
     }
+    TotalLineLen+=other.TotalLineLen;
+    TotalLineCount+=other.TotalLineCount;
+    other.Content->clear();
     Content->clear();
-    Content->push_back(Template);
+    Content->push_back(mergedTemplate);
 }
 
 /**

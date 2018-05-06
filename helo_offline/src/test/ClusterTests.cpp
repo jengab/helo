@@ -252,6 +252,12 @@ static const lest::test _clusterSuite[] {
         clust1.join(clust2);
         EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A * C +n");
     },
+    CASE("join: Number constants are not replaced with '+d'") {
+        Cluster clust1 = genCluster(L"A 1 B * +n", L"[\\s]+");
+        Cluster clust2 = genCluster(L"A 1 C +n", L"[\\s]+");
+        clust1.join(clust2);
+        EXPECT(getTemplateMsg(clust1.getContent()->front()) == L"A 1 * +n");
+    },
     CASE("join: After '+n' in second cluster processing stops") {
         Cluster clust1 = genCluster(L"A 1 C D E F", L"[\\s]+");
         Cluster clust2 = genCluster(L"A 2 C X +n", L"[\\s]+");
