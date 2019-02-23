@@ -7,6 +7,7 @@
 
 #include "ClusterTemplate.h"
 #include "ConfigFile.h"
+#include "LogParser.h"
 
 /**
 * @file ClusterParser.h
@@ -21,17 +22,18 @@
 */
 class ClusterParser{
 private:
-	const Settings settings;
-	std::mutex WriteMutex;
+    const Settings settings;
+    const LogParser logParser;
+    std::mutex WriteMutex;
     std::list<ClusterTemplate> Clusters;
-	ClusterParser(const ClusterParser&):settings(){}
+    ClusterParser(const ClusterParser&):settings(),logParser(settings.HeaderLen, settings.regexp){}
 
 public:
-	ClusterParser(const Settings&);
-	//friend std::wistream& operator>>(std::wistream&,ClusterParser&);
-	friend std::wostream& operator<<(std::wostream&,ClusterParser&);
-	void printToConsole() const;
-	void ProcessMessage(std::wstring&);
+    ClusterParser(const Settings&);
+    //friend std::wistream& operator>>(std::wistream&,ClusterParser&);
+    friend std::wostream& operator<<(std::wostream&,ClusterParser&);
+    void printToConsole() const;
+    void ProcessMessage(std::wstring&);
 };
 
 #endif

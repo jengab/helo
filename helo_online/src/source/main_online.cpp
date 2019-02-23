@@ -40,17 +40,17 @@ const char* SemaphoreName="STOP_HELO_ONLINE";
 * @param[in] acceptor The acceptor object used for listening
 */
 void StopHandler(acceptorPtr acceptor){
-	named_semaphore(open_or_create,SemaphoreName,0).wait();
-	try{
-		tcp::endpoint dest=acceptor->local_endpoint();
-		boost::asio::io_service srv;
-		tcp::socket tempSock(srv);
-		acceptor->close();
-		tempSock.connect(dest);
-		tempSock.shutdown(tcp::socket::shutdown_both);
-		tempSock.close();
-	}
-	catch(boost::system::system_error&){}
+    named_semaphore(open_or_create,SemaphoreName,0).wait();
+    try{
+        tcp::endpoint dest=acceptor->local_endpoint();
+        boost::asio::io_service srv;
+        tcp::socket tempSock(srv);
+        acceptor->close();
+        tempSock.connect(dest);
+        tempSock.shutdown(tcp::socket::shutdown_both);
+        tempSock.close();
+    }
+    catch(boost::system::system_error&){}
 }
 
 /**
@@ -63,32 +63,32 @@ void StopHandler(acceptorPtr acceptor){
 * @param[in] settings The settings loaded from command prompt/config file
 */
 void ServeRequest(socketPtr sock,std::shared_ptr<ClusterParser> parser,const Settings& settings){
-	try{
-		std::string msg;
-		while(true){
-			char byte;
-			boost::system::error_code error;
-			sock->read_some(boost::asio::buffer(&byte,1),error);
-			msg+=byte;
+    try{
+        std::string msg;
+        while(true){
+            char byte;
+            boost::system::error_code error;
+            sock->read_some(boost::asio::buffer(&byte,1),error);
+            msg+=byte;
 
-			if(byte=='\n'){
-				std::wstring NewMsg=std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(msg);
-				//OutputHandler::print(std::cout,NewMsg);
-				parser->ProcessMessage(NewMsg);
-				msg="";
-			}
-			if(error==boost::asio::error::eof){
-				break;
-			}
-			else if(error){
-				std::cout << "Error occurred in the server thread!\n";
-				throw boost::system::system_error(error);
-			}
-		}
-	}
-	catch(const std::exception& e){
-		OutputHandler::logException(settings.ErrorStream,"Exception in thread: ",e);
-	}
+            if(byte=='\n'){
+                std::wstring NewMsg=std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(msg);
+                //OutputHandler::print(std::cout,NewMsg);
+                parser->ProcessMessage(NewMsg);
+                msg="";
+            }
+            if(error==boost::asio::error::eof){
+                break;
+            }
+            else if(error){
+                std::cout << "Error occurred in the server thread!\n";
+                throw boost::system::system_error(error);
+            }
+        }
+    }
+    catch(const std::exception& e){
+        OutputHandler::logException(settings.ErrorStream,"Exception in thread: ",e);
+    }
 }
 
 /**
@@ -134,133 +134,133 @@ void ServeRequest(socketPtr sock,std::shared_ptr<ClusterParser> parser,const Set
  * </table>
  */
 int main(int argc,char** argv){
-	const string HelpMsg=string("Usage: helo_online <input_file> [options]\n Options: \n")+
-						 string("  -p<value> : Sets the port where we receive the log messages (default: 514)\n")+
-						 string("  -lo<value> : Sets the localization to use (this is the system localization by default\n")+
-						 string("  -he<value> : Sets the length of header part of log messages (4 by default)\n")+
-						 string("  -lf<value> : Sets the path of the log file to use\n")+
-						 string("  -mt<value> : Sets the goodness threshold for cluster merging\n")+
-						 string("  -re<value> : Sets the regular expression used for tokenization\n\n");
+    const string HelpMsg=string("Usage: helo_online <input_file> [options]\n Options: \n")+
+                         string("  -p<value> : Sets the port where we receive the log messages (default: 514)\n")+
+                         string("  -lo<value> : Sets the localization to use (this is the system localization by default\n")+
+                         string("  -he<value> : Sets the length of header part of log messages (4 by default)\n")+
+                         string("  -lf<value> : Sets the path of the log file to use\n")+
+                         string("  -mt<value> : Sets the goodness threshold for cluster merging\n")+
+                         string("  -re<value> : Sets the regular expression used for tokenization\n\n");
 
-	Settings settings;
-	settings.port=514;
-	settings.HeaderLen=4;
-	settings.lim=0.4;
-	settings.loc="";
-	settings.DbFile="";
-	ofstream LogFile;
-	string LogPath;
+    Settings settings;
+    settings.port=514;
+    settings.HeaderLen=4;
+    settings.lim=0.4;
+    settings.loc="";
+    settings.DbFile="";
+    ofstream LogFile;
+    string LogPath;
 
-	if(argc>1){
-		if(strcmp(argv[1],"stop")==0){
-			cout << "Trying to stop the processor...\n";
-			named_semaphore(open_or_create,SemaphoreName,0).post();
-			return 0;
-		}
-		if(strcmp(argv[1],"-h")==0){
-			cout << HelpMsg;
-			return 0;
-		}
+    if(argc>1){
+        if(strcmp(argv[1],"stop")==0){
+            cout << "Trying to stop the processor...\n";
+            named_semaphore(open_or_create,SemaphoreName,0).post();
+            return 0;
+        }
+        if(strcmp(argv[1],"-h")==0){
+            cout << HelpMsg;
+            return 0;
+        }
 
-		settings.DbFile=argv[1];
+        settings.DbFile=argv[1];
 
-		for(int i=2;i<argc;++i){
-			if(strncmp(argv[i],"-p",2)==0) settings.port=atoi(&argv[i][2]);
-			if(strncmp(argv[i],"-he",3)==0) settings.HeaderLen=atoi(&argv[i][3]);
-			if(strncmp(argv[i],"-lo",3)==0) settings.loc=string(&argv[i][3]);
-			if(strncmp(argv[i],"-mt",3)==0) settings.lim=atoi(&argv[i][3]);
+        for(int i=2;i<argc;++i){
+            if(strncmp(argv[i],"-p",2)==0) settings.port=atoi(&argv[i][2]);
+            if(strncmp(argv[i],"-he",3)==0) settings.HeaderLen=atoi(&argv[i][3]);
+            if(strncmp(argv[i],"-lo",3)==0) settings.loc=string(&argv[i][3]);
+            if(strncmp(argv[i],"-mt",3)==0) settings.lim=atoi(&argv[i][3]);
 
-			if(strncmp(argv[i],"-re",3)==0){
-				string tempStr(&argv[i][3]);
-				settings.regexp=wstring(tempStr.begin(),tempStr.end());
-			}
+            if(strncmp(argv[i],"-re",3)==0){
+                string tempStr(&argv[i][3]);
+                settings.regexp=wstring(tempStr.begin(),tempStr.end());
+            }
 
-			if(strncmp(argv[i],"-lf",3)==0){
-				LogFile.open(&argv[i][3],ios::out | ios::app);
-				LogPath=std::string(&argv[i][3]);
-				if(LogFile.fail()){
-					cerr << "The log file couldn't be created\n";
-					return -1;
-				}
-				settings.ErrorStream=&LogFile;
-			}
-		}
-	}
-	else{
-		try{
-			ConfigFile conf;
-			settings=conf.getConfig();
-			LogFile.open(conf.getLogPath(),ios::out | ios::app);
-			LogPath=conf.getLogPath();
-			if(LogFile.fail()){
-				cerr << "The log file couldn't be created\n";
-				return -1;
-			}
-			settings.ErrorStream=&LogFile;
-		}
-		catch(std::exception& e){
-			OutputHandler::logException(settings.ErrorStream,"",e);
-			cout << HelpMsg;
-			LogFile.close();
-			return -1;
-		}
-	}
+            if(strncmp(argv[i],"-lf",3)==0){
+                LogFile.open(&argv[i][3],ios::out | ios::app);
+                LogPath=std::string(&argv[i][3]);
+                if(LogFile.fail()){
+                    cerr << "The log file couldn't be created\n";
+                    return -1;
+                }
+                settings.ErrorStream=&LogFile;
+            }
+        }
+    }
+    else{
+        try{
+            ConfigFile conf;
+            settings=conf.getConfig();
+            LogFile.open(conf.getLogPath(),ios::out | ios::app);
+            LogPath=conf.getLogPath();
+            if(LogFile.fail()){
+                cerr << "The log file couldn't be created\n";
+                return -1;
+            }
+            settings.ErrorStream=&LogFile;
+        }
+        catch(std::exception& e){
+            OutputHandler::logException(settings.ErrorStream,"",e);
+            cout << HelpMsg;
+            LogFile.close();
+            return -1;
+        }
+    }
 
-	std::cout << "Starting HELO online. Applied parameters:\n" << " Listen port: " << settings.port << std::endl;
-	std::cout << " Cluster file path: " << settings.DbFile << "\n Log file path: " << LogPath << "\n Header length: " << settings.HeaderLen;
-	std::cout << "\n Regular expression: " << std::string(settings.regexp.begin(),settings.regexp.end()) << std::endl;
+    std::cout << "Starting HELO online. Applied parameters:\n" << " Listen port: " << settings.port << std::endl;
+    std::cout << " Cluster file path: " << settings.DbFile << "\n Log file path: " << LogPath << "\n Header length: " << settings.HeaderLen;
+    std::cout << "\n Regular expression: " << std::string(settings.regexp.begin(),settings.regexp.end()) << std::endl;
 
-	std::shared_ptr<ClusterParser> proc;
-	boost::asio::io_service srv;
-	acceptorPtr acceptor=std::make_shared<tcp::acceptor>(srv);
+    std::shared_ptr<ClusterParser> proc;
+    boost::asio::io_service srv;
+    acceptorPtr acceptor=std::make_shared<tcp::acceptor>(srv);
 
-	try{
-		locale WordLocale=locale(settings.loc.c_str());
-		locale local=locale(WordLocale,locale(),locale::numeric);
-		proc=std::make_shared<ClusterParser>(settings);
-		//proc->printToConsole();
+    try{
+        locale WordLocale=locale(settings.loc.c_str());
+        locale local=locale(WordLocale,locale(),locale::numeric);
+        proc=std::make_shared<ClusterParser>(settings);
+        //proc->printToConsole();
 
-		tcp::endpoint logger(tcp::v4(),settings.port);
-		acceptor->open(logger.protocol());
-		acceptor->set_option(tcp::acceptor::reuse_address(true));
-		acceptor->bind(logger);
-		acceptor->listen();
-	}
-	catch(const SQLite::Exception& e){
-		OutputHandler::logException(settings.ErrorStream,"A problem occurred during reading the database: ",e);
-		LogFile.close();
-		return -1;
-	}
-	catch(const boost::system::system_error& e){
-		OutputHandler::logException(settings.ErrorStream,"An error occurred during trying to listen on port: ",e);
-		LogFile.close();
-		return -1;
-	}
-	catch(runtime_error&){
-		OutputHandler::print(settings.ErrorStream,std::string("The provided localization is invalid, try using the default (no parameter) instead!"));
-		LogFile.close();
-		return -1;
-	}
+        tcp::endpoint logger(tcp::v4(),settings.port);
+        acceptor->open(logger.protocol());
+        acceptor->set_option(tcp::acceptor::reuse_address(true));
+        acceptor->bind(logger);
+        acceptor->listen();
+    }
+    catch(const SQLite::Exception& e){
+        OutputHandler::logException(settings.ErrorStream,"A problem occurred during reading the database: ",e);
+        LogFile.close();
+        return -1;
+    }
+    catch(const boost::system::system_error& e){
+        OutputHandler::logException(settings.ErrorStream,"An error occurred during trying to listen on port: ",e);
+        LogFile.close();
+        return -1;
+    }
+    catch(runtime_error&){
+        OutputHandler::print(settings.ErrorStream,std::string("The provided localization is invalid, try using the default (no parameter) instead!"));
+        LogFile.close();
+        return -1;
+    }
 
-	std::thread(StopHandler,acceptor).detach();
-	while(true){
-		try{
-			std::shared_ptr<tcp::socket> remote=std::make_shared<tcp::socket>(srv);
-			acceptor->accept(*remote);
-			std::thread(ServeRequest,remote,proc,settings).detach();
-		}
-		catch(boost::system::system_error& e){
+    std::thread(StopHandler,acceptor).detach();
+    while(true){
+        try{
+            std::shared_ptr<tcp::socket> remote=std::make_shared<tcp::socket>(srv);
+            acceptor->accept(*remote);
+            std::thread(ServeRequest,remote,proc,settings).detach();
+        }
+        catch(boost::system::system_error& e){
 
-			if(e.code().value()==10004 || e.code().value()==9){ //system error codes are different on different platforms
-				OutputHandler::print(settings.ErrorStream,std::string("Termination request, now shutting down...\n"));
-				named_semaphore::remove(SemaphoreName);
-				LogFile.close();
-				return 0;
-			}
+            if(e.code().value()==10004 || e.code().value()==9){ //system error codes are different on different platforms
+                OutputHandler::print(settings.ErrorStream,std::string("Termination request, now shutting down...\n"));
+                named_semaphore::remove(SemaphoreName);
+                LogFile.close();
+                return 0;
+            }
 
-			OutputHandler::logException(settings.ErrorStream,std::string("An error occurred during socket handling.\n Now closing the program...\n"),e);
-			LogFile.close();
-			return -1;
-		}
-	}
+            OutputHandler::logException(settings.ErrorStream,std::string("An error occurred during socket handling.\n Now closing the program...\n"),e);
+            LogFile.close();
+            return -1;
+        }
+    }
 }
