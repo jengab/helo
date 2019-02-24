@@ -81,8 +81,10 @@ $(3PP_BUILD)/pugi_build/pugixml.o: $(3PP_BUILD)/pugi_build/pugixml.cpp
 
 $(3PP_BUILD)/pugi_build/pugixml.cpp: $(3PP_SRC)
 	mkdir -p $(3PP_BUILD)/pugi_build
-	find $(3PP_SRC)/pugixml/src -regex ".*\.\(hpp\|cpp\)" -exec cp {} $(3PP_BUILD)/pugi_build \;
-	sed -i '/\/\/ #define PUGIXML_WCHAR_MODE/c\#define PUGIXML_WCHAR_MODE' $(3PP_BUILD)/pugi_build/pugiconfig.hpp
+	find $(3PP_SRC)/pugixml/src -regex ".*\.cpp" -exec cp {} $(3PP_BUILD)/pugi_build \;
+	find $(3PP_SRC)/pugixml/src -regex ".*\.hpp" -exec cp {} $(3PP_BUILD)/pugi_build \;
+	echo "#define PUGIXML_WCHAR_MODE" >> $(3PP_BUILD)/pugi_build/pugiconfig.hpp
+	#sed -i '/\/\/ #define PUGIXML_WCHAR_MODE/c\#define PUGIXML_WCHAR_MODE' $(3PP_BUILD)/pugi_build/pugiconfig.hpp
 
 $(3PP_BUILD)/sqlitecpp_build: $(3PP_SRC)
 	mkdir -p $(3PP_BUILD)/sqlitecpp_build
